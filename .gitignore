@@ -1,3 +1,17 @@
+# Visaul Studio Stuff
+*.sdf
+*.suo
+*Thumbs.db
+*.opensdf
+*.VC.db
+*.VC.opendb
+*.vcxproj.user
+Build/*
+SDL/VisualC/SDL/Debug/*
+SDL/VisualC/SDL/Release/*
+SDL/VisualC/SDLmain/Debug/*
+SDL/VisualC/SDLmain/Release/*
+
 # Compiled Object files
 *.slo
 *.lo
