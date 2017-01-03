@@ -247,6 +247,7 @@ private:
 
 		// Helper functions.
 		auto IsBetween = []( const auto& v1 , const auto& min , const auto& max) -> bool{ return (v1>=min) && (v1<=max); };
+		auto Clamp =[](const auto& v1, const auto& min, const auto& max)->const auto { return ( (v1)>(max)?(max):(v1)<(min)?(min):(v1) ); };
 
 		XINPUT_STATE State;
 		zero( &State );
@@ -292,11 +293,11 @@ private:
 			if( State.Gamepad.sThumbRY >  XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ){ SetDownThisFrame( sdl_xi_button::RUP , true ); }
 			if( State.Gamepad.sThumbRY < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ){ SetDownThisFrame( sdl_xi_button::RDOWN , true ); }
 
-			m_RightStickAxis[0] = State.Gamepad.sThumbRX/32767.f;
-			m_RightStickAxis[1] = State.Gamepad.sThumbRY/32767.f;
+			m_RightStickAxis[0] = Clamp(State.Gamepad.sThumbRX/32767.f,-1.f,1.f);
+			m_RightStickAxis[1] = Clamp(State.Gamepad.sThumbRY/32767.f,-1.f,1.f);
 
-			m_LeftStickAxis[0] = State.Gamepad.sThumbLX/32767.f;
-			m_LeftStickAxis[1] = State.Gamepad.sThumbLY/32767.f;
+			m_LeftStickAxis[0] = Clamp(State.Gamepad.sThumbLX/32767.f,-1.f,1.f);
+			m_LeftStickAxis[1] = Clamp(State.Gamepad.sThumbLY/32767.f,-1.f,1.f);
 
 			if( IsBetween( State.Gamepad.sThumbRX, -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE , XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ) )
 			{
