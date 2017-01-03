@@ -68,22 +68,22 @@
     <_ProjectFileVersion>14.0.25431.1</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>../../../Build/$(Configuration)_$(PlatformTarget)/$(Project)/</OutDir>
+    <OutDir>../../../Build/$(Configuration)_$(PlatformTarget)/$(ProjectName)/</OutDir>
     <IntDir>$(OutDir)/Intermediate/</IntDir>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>../../../Build/$(Configuration)_$(PlatformTarget)/$(Project)/</OutDir>
+    <OutDir>../../../Build/$(Configuration)_$(PlatformTarget)/$(ProjectName)/</OutDir>
     <IntDir>$(OutDir)/Intermediate/</IntDir>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>../../../Build/$(Configuration)_$(PlatformTarget)/$(Project)/</OutDir>
+    <OutDir>../../../Build/$(Configuration)_$(PlatformTarget)/$(ProjectName)/</OutDir>
     <IntDir>$(OutDir)/Intermediate/</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>../../../Build/$(Configuration)_$(PlatformTarget)/$(Project)/</OutDir>
+    <OutDir>../../../Build/$(Configuration)_$(PlatformTarget)/$(ProjectName)/</OutDir>
     <IntDir>$(OutDir)/Intermediate/</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
@@ -105,7 +105,7 @@
       <PrecompiledHeaderOutputFile>.\Debug/SDL.pch</PrecompiledHeaderOutputFile>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <ResourceCompile>
@@ -114,7 +114,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>winmm.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>xinput.lib;winmm.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -149,7 +149,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>xinput.lib;winmm.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -188,7 +188,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>winmm.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>xinput.lib;winmm.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <ProgramDatabaseFile>.\Release/SDL.pdb</ProgramDatabaseFile>
@@ -223,7 +223,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>xinput.lib;winmm.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <ProgramDatabaseFile>.\Release/SDL.pdb</ProgramDatabaseFile>
@@ -254,6 +254,7 @@
     <ClCompile Include="..\..\src\file\SDL_rwops.c" />
     <ClCompile Include="..\..\src\joystick\SDL_joystick.c" />
     <ClCompile Include="..\..\src\joystick\win32\SDL_mmjoystick.c" />
+    <ClCompile Include="..\..\src\joystick\win32\SDL_xinputjoystick.cpp" />
     <ClCompile Include="..\..\src\loadso\win32\SDL_sysloadso.c" />
     <ClCompile Include="..\..\src\SDL.c" />
     <ClCompile Include="..\..\src\SDL_error.c" />

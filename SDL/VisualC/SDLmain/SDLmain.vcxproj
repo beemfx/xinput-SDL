@@ -93,27 +93,27 @@
     <_ProjectFileVersion>14.0.25431.1</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>../../../Build/$(Configuration)_$(PlatformTarget)/$(Project)/</OutDir>
+    <OutDir>../../../Build/$(Configuration)_$(PlatformTarget)/$(ProjectName)/</OutDir>
     <IntDir>$(OutDir)/Intermediate/</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>../../../Build/$(Configuration)_$(PlatformTarget)/$(Project)/</OutDir>
+    <OutDir>../../../Build/$(Configuration)_$(PlatformTarget)/$(ProjectName)/</OutDir>
     <IntDir>$(OutDir)/Intermediate/</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_NoSTDIO|Win32'">
-    <OutDir>../../../Build/$(Configuration)_$(PlatformTarget)/$(Project)/</OutDir>
+    <OutDir>../../../Build/$(Configuration)_$(PlatformTarget)/$(ProjectName)/</OutDir>
     <IntDir>$(OutDir)/Intermediate/</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_NoSTDIO|x64'">
-    <OutDir>../../../Build/$(Configuration)_$(PlatformTarget)/$(Project)/</OutDir>
+    <OutDir>../../../Build/$(Configuration)_$(PlatformTarget)/$(ProjectName)/</OutDir>
     <IntDir>$(OutDir)/Intermediate/</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>../../../Build/$(Configuration)_$(PlatformTarget)/$(Project)/</OutDir>
+    <OutDir>../../../Build/$(Configuration)_$(PlatformTarget)/$(ProjectName)/</OutDir>
     <IntDir>$(OutDir)/Intermediate/</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>../../../Build/$(Configuration)_$(PlatformTarget)/$(Project)/</OutDir>
+    <OutDir>../../../Build/$(Configuration)_$(PlatformTarget)/$(ProjectName)/</OutDir>
     <IntDir>$(OutDir)/Intermediate/</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
