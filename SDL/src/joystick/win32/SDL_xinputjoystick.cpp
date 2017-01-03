@@ -403,8 +403,31 @@ void SDL_SYS_JoystickUpdate(SDL_Joystick *joystick)
 		Handler.Update();
 
 		//SDL_Private
-		SDL_PrivateJoystickAxis( joystick , 0 , static_cast<Sint16>(Handler.GetLeftStickAxis()[0]*32767.f) );
-		SDL_PrivateJoystickAxis( joystick , 1 , -static_cast<Sint16>(Handler.GetLeftStickAxis()[1]*32767.f) );
+		Sint16 MainAxisX = static_cast<Sint16>(Handler.GetLeftStickAxis()[0]*32767.f);
+		Sint16 MainAxisY = -static_cast<Sint16>(Handler.GetLeftStickAxis()[1]*32767.f);
+
+		if( Handler.IsDown( sdl_xi_button::DUP ) )
+		{
+			MainAxisY = -32768;
+		}
+
+		if( Handler.IsDown( sdl_xi_button::DDOWN ) )
+		{
+			MainAxisY = 32767;
+		}
+
+		if( Handler.IsDown( sdl_xi_button::DLEFT ) )
+		{
+			MainAxisX = -32768;
+		}
+
+		if( Handler.IsDown( sdl_xi_button::DRIGHT ) )
+		{
+			MainAxisX = 32767;
+		}
+
+		SDL_PrivateJoystickAxis( joystick , 0 , MainAxisX );
+		SDL_PrivateJoystickAxis( joystick , 1 , MainAxisY );
 		SDL_PrivateJoystickAxis( joystick , 2 , static_cast<Sint16>(Handler.GetRightStickAxis()[0]*32767.f) );
 		SDL_PrivateJoystickAxis( joystick , 3 , -static_cast<Sint16>(Handler.GetRightStickAxis()[1]*32767.f) );
 
