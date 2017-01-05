@@ -140,7 +140,7 @@ typedef unsigned int uintptr_t;
 #ifdef _WIN32_WCE
 #define SDL_JOYSTICK_DISABLED   1
 #else
-//#define SDL_JOYSTICK_WINMM	0
+#define SDL_JOYSTICK_WINMM	1
 #define SDL_JOYSTICK_XINPUT 1
 #endif
 

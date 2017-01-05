@@ -30,7 +30,7 @@ slouken@libsdl.org
 extern "C" {
 #include "SDL_joystick.h"
 #include "SDL_events.h"
-#include "../SDL_sysjoystick.h"
+#include "SDL_win32_sysjoystick.h"
 #include "../SDL_joystick_c.h"
 }
 
@@ -346,7 +346,7 @@ private:
 static SDL_XInputHandler SDL_XInputHandlers[XUSER_MAX_COUNT];
 
 
-int SDL_SYS_JoystickInit(void)
+int SDL_SYS_XINPUT_JoystickInit(void)
 {
 #if(_WIN32_WINNT >= _WIN32_WINNT_WIN8)
 	XInputEnable( TRUE );
@@ -356,7 +356,7 @@ int SDL_SYS_JoystickInit(void)
 	return SDL_numjoysticks;
 }
 
-const char *SDL_SYS_JoystickName( int index )
+const char *SDL_SYS_XINPUT_JoystickName( int index )
 {
 	switch( index )
 	{
@@ -374,7 +374,7 @@ The joystick to open is specified by the index field of the joystick.
 This should fill the nbuttons and naxes fields of the joystick structure.
 It returns 0, or -1 if there is an error.
 */
-int SDL_SYS_JoystickOpen(SDL_Joystick *joystick)
+int SDL_SYS_XINPUT_JoystickOpen(SDL_Joystick *joystick)
 {
 	if( joystick && 0 <= joystick->index && joystick->index < countof(SDL_XInputHandlers) )
 	{
@@ -395,7 +395,7 @@ int SDL_SYS_JoystickOpen(SDL_Joystick *joystick)
 * but instead should call SDL_PrivateJoystick*() to deliver events
 * and update joystick device state.
 */
-void SDL_SYS_JoystickUpdate(SDL_Joystick *joystick)
+void SDL_SYS_XINPUT_JoystickUpdate(SDL_Joystick *joystick)
 {
 	if( joystick && 0 <= joystick->index && joystick->index < countof(SDL_XInputHandlers) )
 	{
@@ -447,7 +447,7 @@ void SDL_SYS_JoystickUpdate(SDL_Joystick *joystick)
 }
 
 /* Function to close a joystick after use */
-void SDL_SYS_JoystickClose(SDL_Joystick *joystick)
+void SDL_SYS_XINPUT_JoystickClose(SDL_Joystick *joystick)
 {
 	if( joystick && 0 <= joystick->index && joystick->index < countof(SDL_XInputHandlers) )
 	{
@@ -456,7 +456,7 @@ void SDL_SYS_JoystickClose(SDL_Joystick *joystick)
 }
 
 /* Function to perform any system-specific joystick related cleanup */
-void SDL_SYS_JoystickQuit(void)
+void SDL_SYS_XINPUT_JoystickQuit(void)
 {
 #if(_WIN32_WINNT >= _WIN32_WINNT_WIN8)
 	XInputEnable( FALSE );

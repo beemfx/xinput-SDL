@@ -32,7 +32,7 @@
 
 #include "SDL_events.h"
 #include "SDL_joystick.h"
-#include "../SDL_sysjoystick.h"
+#include "SDL_win32_sysjoystick.h"
 #include "../SDL_joystick_c.h"
 
 #define MAX_JOYSTICKS	16
@@ -136,7 +136,7 @@ static char *GetJoystickName(int index, const char *szRegKey)
  * joysticks.  Joystick 0 should be the system default joystick.
  * It should return 0, or -1 on an unrecoverable fatal error.
  */
-int SDL_SYS_JoystickInit(void)
+int SDL_SYS_MM_JoystickInit(void)
 {
 	int	i;
 	int maxdevs;
@@ -173,7 +173,7 @@ int SDL_SYS_JoystickInit(void)
 }
 
 /* Function to get the device-dependent name of a joystick */
-const char *SDL_SYS_JoystickName(int index)
+const char *SDL_SYS_MM_JoystickName(int index)
 {
 	if ( SYS_JoystickName[index] != NULL ) {
 		return(SYS_JoystickName[index]);
@@ -187,7 +187,7 @@ const char *SDL_SYS_JoystickName(int index)
    This should fill the nbuttons and naxes fields of the joystick structure.
    It returns 0, or -1 if there is an error.
  */
-int SDL_SYS_JoystickOpen(SDL_Joystick *joystick)
+int SDL_SYS_MM_JoystickOpen(SDL_Joystick *joystick)
 {
 	int index, i;
 	int caps_flags[MAX_AXES-2] =
@@ -271,7 +271,7 @@ static Uint8 TranslatePOV(DWORD value)
  * but instead should call SDL_PrivateJoystick*() to deliver events
  * and update joystick device state.
  */
-void SDL_SYS_JoystickUpdate(SDL_Joystick *joystick)
+void SDL_SYS_MM_JoystickUpdate(SDL_Joystick *joystick)
 {
 	MMRESULT result;
 	int i;
@@ -339,7 +339,7 @@ void SDL_SYS_JoystickUpdate(SDL_Joystick *joystick)
 }
 
 /* Function to close a joystick after use */
-void SDL_SYS_JoystickClose(SDL_Joystick *joystick)
+void SDL_SYS_MM_JoystickClose(SDL_Joystick *joystick)
 {
 	if (joystick->hwdata != NULL) {
 		/* free system specific hardware data */
@@ -349,7 +349,7 @@ void SDL_SYS_JoystickClose(SDL_Joystick *joystick)
 }
 
 /* Function to perform any system-specific joystick related cleanup */
-void SDL_SYS_JoystickQuit(void)
+void SDL_SYS_MM_JoystickQuit(void)
 {
 	int i;
 	for (i = 0; i < MAX_JOYSTICKS; i++) {
