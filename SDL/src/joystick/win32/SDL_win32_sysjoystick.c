@@ -78,8 +78,36 @@ static const SDL_JoystickInterface* SDL_ActiveJoystickInterface = &SDL_NULL_Joys
 
 int SDL_SYS_JoystickInit(void)
 {
-	SDL_ActiveJoystickInterface = &SDL_XINPUT_JoysticInterface;
-	return SDL_ActiveJoystickInterface->JoystickInit();
+	int NumJoysticks = 0;
+
+	#if SDL_JOYSTICK_XINPUT
+	if( 0 == NumJoysticks )
+	{
+		NumJoysticks = SDL_SYS_XINPUT_JoystickInit();
+		if( NumJoysticks > 0 )
+		{
+			SDL_ActiveJoystickInterface = &SDL_XINPUT_JoysticInterface;
+		}
+	}
+	#endif
+
+	#if SDL_JOYSTICK_WINMM
+	if( 0 == NumJoysticks )
+	{
+		NumJoysticks = SDL_SYS_MM_JoystickInit();
+		if( NumJoysticks > 0 )
+		{
+			SDL_ActiveJoystickInterface = &SDL_XINPUT_JoysticInterface;
+		}
+	}
+	#endif
+
+	if( 0 == NumJoysticks )
+	{
+		SDL_ActiveJoystickInterface = &SDL_NULL_JoysticInterface;
+	}
+	
+	return NumJoysticks;
 }
 
 const char *SDL_SYS_JoystickName(int index)

@@ -351,7 +351,18 @@ int SDL_SYS_XINPUT_JoystickInit(void)
 #if(_WIN32_WINNT >= _WIN32_WINNT_WIN8)
 	XInputEnable( TRUE );
 #endif
-	SDL_numjoysticks = XUSER_MAX_COUNT;
+
+	XINPUT_CAPABILITIES Caps;
+	memset( &Caps , 0 , sizeof(Caps) );
+	for( DWORD i=0; i<XUSER_MAX_COUNT; i++ )
+	{
+		DWORD Res = XInputGetCapabilities( 0 , XINPUT_FLAG_GAMEPAD , &Caps );
+		if( Res == ERROR_DEVICE_NOT_CONNECTED )
+		{
+			break;
+		}
+		SDL_numjoysticks++;
+	}
 
 	return SDL_numjoysticks;
 }
@@ -396,7 +407,7 @@ int SDL_SYS_XINPUT_JoystickOpen(SDL_Joystick *joystick)
 * and update joystick device state.
 */
 void SDL_SYS_XINPUT_JoystickUpdate(SDL_Joystick *joystick)
-{
+{	
 	if( joystick && 0 <= joystick->index && joystick->index < countof(SDL_XInputHandlers) )
 	{
 		SDL_XInputHandler& Handler = SDL_XInputHandlers[joystick->index];
