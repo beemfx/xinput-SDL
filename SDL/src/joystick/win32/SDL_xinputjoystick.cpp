@@ -32,6 +32,7 @@ extern "C" {
 #include "SDL_events.h"
 #include "SDL_win32_sysjoystick.h"
 #include "../SDL_joystick_c.h"
+#include "../../events/SDL_events_c.h"
 }
 
 #define countof(b) (sizeof(b)/sizeof(0[(b)]))
@@ -69,35 +70,48 @@ enum class sdl_xi_button
 static const struct SDL_XInputButtonToKey
 {
 	sdl_xi_button Button;
-	DWORD     Key;
+	SDLKey        Key;
 }
 SDL_XInput_ButtonToKeyTable[] =
 {
-	{ sdl_xi_button::DUP    , 'W' },
-	{ sdl_xi_button::DDOWN  , 'S' },
-	{ sdl_xi_button::DLEFT  , 'A' },
-	{ sdl_xi_button::DRIGHT , 'D' },
-	{ sdl_xi_button::START  , VK_RETURN },
-	{ sdl_xi_button::BACK   , VK_ESCAPE },
-	{ sdl_xi_button::L3     , VK_NEXT },
-	{ sdl_xi_button::R3     , VK_PRIOR },
-	{ sdl_xi_button::L1     , VK_OEM_4 },
-	{ sdl_xi_button::R1     , VK_OEM_6 },
-	{ sdl_xi_button::A      , VK_CONTROL },
-	{ sdl_xi_button::B      , 'Z' },
-	{ sdl_xi_button::X      , 'X' },
-	{ sdl_xi_button::Y      , 'C' },
-	{ sdl_xi_button::L2     , VK_OEM_COMMA },
-	{ sdl_xi_button::R2     , VK_OEM_PERIOD },
-	{ sdl_xi_button::LUP    , 'W' },
-	{ sdl_xi_button::LDOWN  , 'S' },
-	{ sdl_xi_button::LLEFT  , 'A' },
-	{ sdl_xi_button::LRIGHT , 'D' },
-	{ sdl_xi_button::RUP    , VK_NUMPAD8 },
-	{ sdl_xi_button::RDOWN  , VK_NUMPAD2 },
-	{ sdl_xi_button::RLEFT  , VK_NUMPAD4 },
-	{ sdl_xi_button::RRIGHT , VK_NUMPAD6 },
+	{ sdl_xi_button::DUP    , SDLK_w },
+	{ sdl_xi_button::DDOWN  , SDLK_s },
+	{ sdl_xi_button::DLEFT  , SDLK_a },
+	{ sdl_xi_button::DRIGHT , SDLK_d },
+	{ sdl_xi_button::START  , SDLK_RETURN },
+	{ sdl_xi_button::BACK   , SDLK_ESCAPE },
+	{ sdl_xi_button::L3     , SDLK_PAGEUP },
+	{ sdl_xi_button::R3     , SDLK_PAGEDOWN },
+	{ sdl_xi_button::L1     , SDLK_LEFTBRACKET },
+	{ sdl_xi_button::R1     , SDLK_RIGHTBRACKET },
+	{ sdl_xi_button::A      , SDLK_LCTRL },
+	{ sdl_xi_button::B      , SDLK_z },
+	{ sdl_xi_button::X      , SDLK_x },
+	{ sdl_xi_button::Y      , SDLK_c },
+	{ sdl_xi_button::L2     , SDLK_COMMA },
+	{ sdl_xi_button::R2     , SDLK_PERIOD },
+	{ sdl_xi_button::LUP    , SDLK_w },
+	{ sdl_xi_button::LDOWN  , SDLK_s },
+	{ sdl_xi_button::LLEFT  , SDLK_a },
+	{ sdl_xi_button::LRIGHT , SDLK_d },
+	{ sdl_xi_button::RUP    , SDLK_KP8 },
+	{ sdl_xi_button::RDOWN  , SDLK_KP2 },
+	{ sdl_xi_button::RLEFT  , SDLK_KP4 },
+	{ sdl_xi_button::RRIGHT , SDLK_KP6 },
 };
+
+static SDL_keysym* SDL_XINPUT_TranslateButton( SDLKey Key , SDL_keysym* KeySm )
+{
+	if( KeySm )
+	{
+		KeySm->scancode = 0;
+		KeySm->mod = KMOD_NONE;
+		KeySm->unicode = 0;
+		KeySm->sym = Key;
+	}
+
+	return KeySm;
+}
 
 class SDL_XInputHandler
 {
@@ -408,6 +422,8 @@ int SDL_SYS_XINPUT_JoystickOpen(SDL_Joystick *joystick)
 */
 void SDL_SYS_XINPUT_JoystickUpdate(SDL_Joystick *joystick)
 {	
+	bool bMapToKeyboard = false;
+
 	if( joystick && 0 <= joystick->index && joystick->index < countof(SDL_XInputHandlers) )
 	{
 		SDL_XInputHandler& Handler = SDL_XInputHandlers[joystick->index];
@@ -446,12 +462,28 @@ void SDL_SYS_XINPUT_JoystickUpdate(SDL_Joystick *joystick)
 		{
 			if( Handler.WasPressed(Mapping.Button) )
 			{
-				SDL_PrivateJoystickButton( joystick , static_cast<Uint8>(Mapping.Button) , SDL_PRESSED );
+				if( !bMapToKeyboard )
+				{
+					SDL_PrivateJoystickButton( joystick , static_cast<Uint8>(Mapping.Button) , SDL_PRESSED );
+				}
+				else
+				{
+					SDL_keysym KeySm;
+					SDL_PrivateKeyboard( SDL_PRESSED , SDL_XINPUT_TranslateButton( Mapping.Key , &KeySm ) );
+				}
 			}
 
 			if( Handler.WasReleased(Mapping.Button) )
 			{
-				SDL_PrivateJoystickButton( joystick , static_cast<Uint8>(Mapping.Button) , SDL_RELEASED );
+				if( !bMapToKeyboard )
+				{
+					SDL_PrivateJoystickButton( joystick , static_cast<Uint8>(Mapping.Button) , SDL_RELEASED );
+				}
+				else
+				{
+					SDL_keysym KeySm;
+					SDL_PrivateKeyboard( SDL_RELEASED , SDL_XINPUT_TranslateButton( Mapping.Key , &KeySm ) );
+				}
 			}
 		}
 	}
