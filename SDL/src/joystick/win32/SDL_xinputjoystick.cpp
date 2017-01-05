@@ -67,10 +67,18 @@ enum class sdl_xi_button
 	COUNT  ,
 };
 
-static const struct SDL_XInputButtonToKey
+enum class sdl_xi_mode
 {
-	sdl_xi_button Button;
-	SDLKey        Key;
+	GAMEPAD,
+	GAMEPAD_ALWAYS,
+	KEYMAP,
+	KEYMAP_ALWAYS,
+};
+
+static struct SDL_XInputButtonToKey
+{
+	const sdl_xi_button Button;
+	SDLKey              Key;
 }
 SDL_XInput_ButtonToKeyTable[] =
 {
@@ -100,6 +108,8 @@ SDL_XInput_ButtonToKeyTable[] =
 	{ sdl_xi_button::RRIGHT , SDLK_KP6 },
 };
 
+static sdl_xi_mode SDL_XINPUT_Config_Mode = sdl_xi_mode::GAMEPAD;
+
 static SDL_keysym* SDL_XINPUT_TranslateButton( SDLKey Key , SDL_keysym* KeySm )
 {
 	if( KeySm )
@@ -111,6 +121,226 @@ static SDL_keysym* SDL_XINPUT_TranslateButton( SDLKey Key , SDL_keysym* KeySm )
 	}
 
 	return KeySm;
+}
+
+static sdl_xi_button SDL_XINPUT_StringToButton( const char* String )
+{
+	auto Equals =[]( const char* Left , const char* Right ) -> bool
+	{
+		return !_stricmp( Left , Right );
+	};
+
+	if( false )
+	{
+	}
+#define HANDLE_ITEM( _name_ ) else if( Equals( String , #_name_ ) ){ return sdl_xi_button::_name_; }
+		HANDLE_ITEM( A      )
+		HANDLE_ITEM( B      )
+		HANDLE_ITEM( X      )
+		HANDLE_ITEM( Y      )
+		HANDLE_ITEM( L1     )
+		HANDLE_ITEM( R1     )
+		HANDLE_ITEM( L2     )
+		HANDLE_ITEM( R2     )
+		HANDLE_ITEM( L3     )
+		HANDLE_ITEM( R3     )
+		HANDLE_ITEM( START  )
+		HANDLE_ITEM( BACK   )
+		HANDLE_ITEM( DUP    )
+		HANDLE_ITEM( DDOWN  )
+		HANDLE_ITEM( DLEFT  )
+		HANDLE_ITEM( DRIGHT )
+		HANDLE_ITEM( LUP    )
+		HANDLE_ITEM( LDOWN  )
+		HANDLE_ITEM( LLEFT  )
+		HANDLE_ITEM( LRIGHT )
+		HANDLE_ITEM( RUP    )
+		HANDLE_ITEM( RDOWN  )
+		HANDLE_ITEM( RLEFT  )
+		HANDLE_ITEM( RRIGHT )
+#undef HANDLE_ITEM
+
+	return sdl_xi_button::COUNT;
+}
+
+static SDLKey SDL_XINPUT_StringToKey( const char* String )
+{
+	auto Equals =[]( const char* Left , const char* Right ) -> bool
+	{
+		return !_stricmp( Left , Right );
+	};
+
+	for( int i=0; i<SDLK_LAST; i++ )
+	{
+		if( Equals( String , SDL_GetKeyName(static_cast<SDLKey>(i)) ) )
+		{
+			return static_cast<SDLKey>(i);
+		}
+	}
+
+	return SDLK_LAST;
+}
+
+static void SDL_XINPUT_SetConfigItem( const char* Item , const char* Value )
+{
+	if( Item[0] == '\0' )
+	{
+		return;
+	}
+
+	auto Equals =[]( const char* Left , const char* Right ) -> bool
+	{
+		return !_stricmp( Left , Right );
+	};
+
+	if( Equals( Item , "mode" ) )
+	{
+		if( Equals( Value , "GAMEPAD" ) )SDL_XINPUT_Config_Mode = sdl_xi_mode::GAMEPAD;
+		else if( Equals( Value , "GAMEPAD_ALWAYS" ) )SDL_XINPUT_Config_Mode = sdl_xi_mode::GAMEPAD_ALWAYS;
+		else if( Equals( Value , "KEYMAP" ) )SDL_XINPUT_Config_Mode = sdl_xi_mode::KEYMAP;
+		else if( Equals( Value , "KEYMAP_ALWAYS" ) )SDL_XINPUT_Config_Mode = sdl_xi_mode::KEYMAP_ALWAYS;
+	}
+	else
+	{
+		sdl_xi_button Button = SDL_XINPUT_StringToButton( Item );
+		SDLKey Key = SDL_XINPUT_StringToKey( Value );
+		if( Button != sdl_xi_button::COUNT && Key != SDLK_LAST )
+		{
+			for( SDL_XInputButtonToKey& Pair : SDL_XInput_ButtonToKeyTable )
+			{
+				if( Pair.Button == Button )
+				{
+					Pair.Key = Key;
+					break;
+				}
+			}
+		}
+	}
+}
+
+static void SDL_XINPUT_InitConfig()
+{
+	// Get the config filename (we want it in the directory of the applciation
+	// not whatever the current working directory is).
+	WCHAR Filename[1024];
+	GetModuleFileNameW( GetModuleHandleW( NULL ) , Filename , countof(Filename) );
+	Filename[countof(Filename)-1] = '\0';
+
+	size_t FilenameLen = wcslen( Filename );
+
+	for( size_t Search = FilenameLen-1; Search > 0; Search-- )
+	{
+		if( Filename[Search] == '\\' || Filename[Search] == '//' )
+		{
+			Filename[Search+1] = '\0'; // Just in case.
+			break;
+		}
+	}
+
+	wcscat( Filename , L"xinputsdl.conf" );
+
+	FILE* InFile = _wfopen( Filename , L"r" );
+	if( InFile )
+	{
+		char Line[256];
+		while( fgets( Line , countof(Line) , InFile ) != nullptr )
+		{
+			Line[countof(Line)-1] = '\0'; // Just in case.
+
+			char Button[256];
+			size_t ButtonPos = 0;
+			char Key[256];
+			size_t KeyPos = 0;
+
+			Button[0] = '\0';
+			Key[0] = '\0';
+
+			auto AppendButton = [&Button,&ButtonPos]( char c ) -> void
+			{
+				if( ButtonPos < (countof(Button)-1) )
+				{
+					Button[ButtonPos] = c;
+					ButtonPos++;
+					Button[ButtonPos] = '\0';
+				}
+			};
+
+			auto AppendKey = [&Key,&KeyPos]( char c ) -> void
+			{
+				if( KeyPos < (countof(Key)-1) )
+				{
+					Key[KeyPos] = c;
+					KeyPos++;
+					Key[KeyPos] = '\0';
+				}
+			};
+
+			auto IsWhitespace = []( char c ) -> bool
+			{
+				return c == ' ' || c == '\r' || c == '\t' || c == '\n';
+			};
+
+			size_t LineLen = strlen( Line );
+
+			bool bReadingKey = false;
+			bool bReadingName = false;
+			bool bInQuote = false;
+			bool bIsComment = false;
+
+			bReadingKey = true;
+
+			for( size_t i=0; i<LineLen; i++ )
+			{
+				char c = Line[i];
+
+				if( bIsComment )
+				{
+					// Do nothing
+				}
+				else if( c == ';' && !bInQuote )
+				{
+					bReadingKey = false;
+					bReadingName = false;
+					bIsComment = true;
+				}
+				else if( c == '=' && !bInQuote )
+				{
+					if( bReadingKey )
+					{
+						bReadingKey = false;
+						bReadingName = true;
+					}
+				}
+				else if( bReadingName && c == '"' )
+				{
+					bInQuote = !bInQuote;
+					if( !bInQuote )
+					{
+						bReadingName = false;
+					}
+				}
+				else if( bReadingName && bInQuote )
+				{
+					AppendKey( c );
+				}
+				else if( bReadingKey && !IsWhitespace(c) )
+				{
+					AppendButton( c );
+				}
+			}
+
+			SDL_XINPUT_SetConfigItem( Button , Key );
+
+			// char TestMessage[1024];
+			// sprintf( TestMessage , "%s\n\"%s\" = \"%s\"" , Line , Button , Key );
+			// MessageBoxA( nullptr , TestMessage , "SDL Test" , MB_OK );
+
+		}
+		// fwprintf( OutFile , L"The file is %s.\n" , Filename );
+		// GetCurrentDirectoryW( countof(Filename) , Filename );
+		// fwprintf( OutFile , L"The directory is %s.\n" , Filename );
+		fclose( InFile );
+	}
 }
 
 class SDL_XInputHandler
@@ -366,6 +596,8 @@ int SDL_SYS_XINPUT_JoystickInit(void)
 	XInputEnable( TRUE );
 #endif
 
+	SDL_XINPUT_InitConfig();
+
 	XINPUT_CAPABILITIES Caps;
 	memset( &Caps , 0 , sizeof(Caps) );
 	for( DWORD i=0; i<XUSER_MAX_COUNT; i++ )
@@ -376,6 +608,18 @@ int SDL_SYS_XINPUT_JoystickInit(void)
 			break;
 		}
 		SDL_numjoysticks++;
+	}
+
+	if( SDL_XINPUT_Config_Mode == sdl_xi_mode::GAMEPAD_ALWAYS || SDL_XINPUT_Config_Mode == sdl_xi_mode::KEYMAP_ALWAYS )
+	{
+		SDL_numjoysticks = XUSER_MAX_COUNT;
+	}
+
+	if( 0 == SDL_numjoysticks )
+	{
+#if(_WIN32_WINNT >= _WIN32_WINNT_WIN8)
+		XInputEnable( FALSE );
+#endif
 	}
 
 	return SDL_numjoysticks;
@@ -422,7 +666,7 @@ int SDL_SYS_XINPUT_JoystickOpen(SDL_Joystick *joystick)
 */
 void SDL_SYS_XINPUT_JoystickUpdate(SDL_Joystick *joystick)
 {	
-	bool bMapToKeyboard = false;
+	bool bMapToKeyboard = (SDL_XINPUT_Config_Mode == sdl_xi_mode::KEYMAP || SDL_XINPUT_Config_Mode == sdl_xi_mode::KEYMAP_ALWAYS);
 
 	if( joystick && 0 <= joystick->index && joystick->index < countof(SDL_XInputHandlers) )
 	{
