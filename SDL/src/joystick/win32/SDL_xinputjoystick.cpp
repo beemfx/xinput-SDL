@@ -204,7 +204,7 @@ static void SDL_XINPUT_SetConfigItem( const char* Item , const char* Value )
 	{
 		sdl_xi_button Button = SDL_XINPUT_StringToButton( Item );
 		SDLKey Key = SDL_XINPUT_StringToKey( Value );
-		if( Button != sdl_xi_button::COUNT && Key != SDLK_LAST )
+		if( Button != sdl_xi_button::COUNT )
 		{
 			for( SDL_XInputButtonToKey& Pair : SDL_XInput_ButtonToKeyTable )
 			{
@@ -712,8 +712,11 @@ void SDL_SYS_XINPUT_JoystickUpdate(SDL_Joystick *joystick)
 				}
 				else
 				{
-					SDL_keysym KeySm;
-					SDL_PrivateKeyboard( SDL_PRESSED , SDL_XINPUT_TranslateButton( Mapping.Key , &KeySm ) );
+					if( Mapping.Key != SDLK_LAST )
+					{
+						SDL_keysym KeySm;
+						SDL_PrivateKeyboard( SDL_PRESSED , SDL_XINPUT_TranslateButton( Mapping.Key , &KeySm ) );
+					}
 				}
 			}
 
@@ -725,8 +728,11 @@ void SDL_SYS_XINPUT_JoystickUpdate(SDL_Joystick *joystick)
 				}
 				else
 				{
-					SDL_keysym KeySm;
-					SDL_PrivateKeyboard( SDL_RELEASED , SDL_XINPUT_TranslateButton( Mapping.Key , &KeySm ) );
+					if( Mapping.Key != SDLK_LAST )
+					{
+						SDL_keysym KeySm;
+						SDL_PrivateKeyboard( SDL_RELEASED , SDL_XINPUT_TranslateButton( Mapping.Key , &KeySm ) );
+					}
 				}
 			}
 		}
